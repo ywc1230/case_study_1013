@@ -1,6 +1,7 @@
 ---
 title: "Case study"
 output: github_document
+always_allow_html: true
 ---
 
 
@@ -8,6 +9,7 @@ output: github_document
 
 library(tidyverse)
 library(p8105.datasets)
+library(leaflet)
 
 knitr::opts_chunk$set(
   fig.width = 6, 
@@ -75,8 +77,48 @@ nyc_airbnb %>%
 ```{r}
 
 nyc_airbnb %>%
-  ggplot(aes(x= neighbourhood_group, y = price)) + 
-  geom_boxplot()
+  filter(neighbourhood_group == "Manhattan") %>%
+  count(neighbourhood)
 
 ```
+
+
+
+```{r}
+
+nyc_airbnb %>%
+  filter(price < 1000, 
+         neighbourhood_group == "Manhattan") %>%
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>%
+  ggplot(aes(x= neighbourhood, y = price)) + 
+  geom_boxplot() +
+  coord_flip()
+
+```
+
+
+```{r}
+
+nyc_airbnb %>% 
+  sample_n(1000) %>%
+  ggplot(aes(x = lat, y = long, color = price)) + 
+  geom_point()
+
+```
+
+## Create a leaflet map
+```{r}
+
+nyc_airbnb %>%
+  sample_n(100) %>% 
+  leaflet() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addCircleMarkers(~lat, ~long, radius = 1)
+  
+
+```
+
+
+
+
 
